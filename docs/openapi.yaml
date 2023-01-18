@@ -1,0 +1,215 @@
+openapi: "3.1"
+info:
+    title: TPC backend Rest API
+    version: "1.0"
+paths:
+    /status:
+        summary: Checks if the server is running
+        get:
+            responses:
+                '200':
+                    description: OK
+                '500':
+                    description: Something is wrong
+    /login:
+        post:
+            description: Login user
+            requestBody:
+                description: Auth data to login user
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AuthData'
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthToken'
+                '400':
+                    description: Incorrect login data
+    /register:
+        post:
+            description: Register user
+            requestBody:
+                description: Data to register new user
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RegisterData'
+            responses:
+                '200':
+                    description: OK
+                '400':
+                    description: Incorrect register data
+                '500':
+                    description: Something is wrong
+    /lobby/{game_session_id}/connect:
+        parameters:
+            -   name: game_session_id
+                description: Game session id for connection
+                in: path
+                required: true
+                schema:
+                    type: integer
+        post:
+            description: Connect current user to game session
+            responses:
+                '200':
+                    description: OK
+                '401':
+                    description: Auth required
+                '409':
+                    description: Game session is not available for connection or user has active game session
+                '500':
+                    description: Something is wrong
+            security:
+                - BearerAuth: []
+    /lobby/create:
+        post:
+            description: Create new game session and connect current user to it
+            responses:
+                '200':
+                    description: OK
+                '401':
+                    description: Auth required
+                '409':
+                    description: User has active game session
+                '500':
+                    description: Something is wrong
+            security:
+                - BearerAuth: []
+    /rating:
+        get:
+            description: List of user rating info
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UserRatingList'
+                '500':
+                    description: Something is wrong
+    /profile/info:
+        get:
+            description: Current user summary info
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UserInfo'
+                '401':
+                    description: Auth required
+                '500':
+                    description: Something is wrong
+            security:
+                - BearerAuth: []
+    /profile/history:
+        get:
+            description: Current user game history info
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UserHistoryList'
+                '401':
+                    description: Auth required
+                '500':
+                    description: Something is wrong
+            security:
+                - BearerAuth: []
+
+components:
+    schemas:
+        AuthData:
+            type: object
+            properties:
+                email:
+                    type: string
+                password:
+                    type: string
+            required:
+                - email
+                - password
+        AuthToken:
+            type: object
+            properties:
+                jwt:
+                    type: string
+            required:
+                - jwt
+        RegisterData:
+            type: object
+            properties:
+                name:
+                    type: string
+                email:
+                    type: string
+                password:
+                    type: string
+            required:
+                - name
+                - email
+                - password
+        UserRatingList:
+            type: array
+            items:
+                $ref: '#/components/schemas/UserRatingItem'
+        UserRatingItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                name:
+                    type: string
+                scores:
+                    type: integer
+            required:
+                - id
+                - name
+                - scores
+        UserInfo:
+            type: object
+            properties:
+                id:
+                    type: integer
+                name:
+                    type: string
+                scores:
+                    type: integer
+                wins:
+                    type: integer
+                loses:
+                    type: integer
+            required:
+                - id
+                - name
+                - scores
+                - wins
+                - loses
+        UserHistoryList:
+            type: array
+            items:
+                $ref: '#/components/schemas/UserHistoryItem'
+        UserHistoryItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                scores_diff:
+                    type: integer
+                players:
+                    type: array
+                    items:
+                        type: string
+    securitySchemes:
+        BearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT

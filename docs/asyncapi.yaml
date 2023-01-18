@@ -1,0 +1,238 @@
+openapi: '2.5.0'
+info:
+    title: TPC backend Websocket API
+    version: 1.0.0
+channels:
+    /lobby/list:
+        description: The topic of available lobby list
+        subscribe:
+            message:
+                $ref: '#/components/messages/LobbyList'
+    /lobby/connect:
+        description: The topic of active lobby for current user
+        publish:
+            message:
+                oneOf:
+                    -   $ref: '#/components/messages/ChangeColor'
+                    -   $ref: '#/components/messages/ChangeReadiness'
+                    -   $ref: '#/components/messages/MovePiece'
+                    -   $ref: '#/components/messages/Consider'
+        subscribe:
+            message:
+                oneOf:
+                    -   $ref: '#/components/messages/GameSession'
+                    -   $ref: '#/components/messages/UserInfoList'
+                    -   $ref: '#/components/messages/PlayerInfoList'
+                    -   $ref: '#/components/messages/PieceList'
+                    -   $ref: '#/components/messages/PossibleMoves'
+components:
+    messages:
+        LobbyList:
+            description: Available lobbies list
+            payload:
+                $ref: '#/components/schemas/LobbyList'
+        ChangeColor:
+            description: Change color for current user
+            payload:
+                $ref: '#/components/schemas/Color'
+        ChangeReadiness:
+            description: Change status for current user
+            payload:
+                $ref: '#/components/schemas/ReadyStatus'
+        MovePiece:
+            description: Move piece on board
+            payload:
+                $ref: '#/components/schemas/PieceMovement'
+        Consider:
+            description: Request to end the game
+        GameSession:
+            description: Info about current lobby status
+            payload:
+                $ref: '#/components/schemas/GameSession'
+        UserInfoList:
+            description: List of info about users in lobby
+            payload:
+                $ref: '#/components/schemas/UserInfoList'
+        PlayerInfoList:
+            description: List of in-game info about players
+            payload:
+                $ref: '#/components/schemas/PlayerInfoList'
+        PieceList:
+            description: List of pieces in game
+            payload:
+                $ref: '#/components/schemas/PieceList'
+        PossibleMoveList:
+            description: Available moves list
+            payload:
+                $ref: '#/components/schemas/PossibleMoveList'
+    schemas:
+        LobbyList:
+            type: array
+            items:
+                $ref: '#/components/schemas/LobbyItem'
+        LobbyItem:
+            type: object
+            properties:
+                game_session_id:
+                    type: integer
+                players:
+                    type: array
+                    items:
+                        type: string
+                required:
+                    - game_session_id
+                    - players
+        Color:
+            type: object
+            properties:
+                value:
+                    type: string
+                    enum: [ 'white', 'black', 'red', 'none' ]
+                required:
+                    - value
+        ReadyStatus:
+            type: object
+            properties:
+                value:
+                    type: string
+                    enum: [ 'not_ready', 'ready' ]
+                required:
+                    - value
+        PieceMovement:
+            type: object
+            properties:
+                id:
+                    type: integer
+                position:
+                    type: string
+                    enum: [
+                        'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8',
+                        'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8',
+                        'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8',
+                        'd1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8',
+                        'e1', 'e2', 'e3', 'e4', 'e9', 'e10', 'e11', 'e12',
+                        'f1', 'f2', 'f3', 'f4', 'f9', 'f10', 'f11', 'f12',
+                        'g1', 'g2', 'g3', 'g4', 'g9', 'g10', 'g11', 'g12',
+                        'h1', 'h2', 'h3', 'h4', 'h9', 'h10', 'h11', 'h12',
+                        'i8', 'i7', 'i6', 'i5', 'i9', 'i10', 'i11', 'i12',
+                        'j8', 'j7', 'j6', 'j5', 'j9', 'j10', 'j11', 'j12',
+                        'k8', 'k7', 'k6', 'k5', 'k9', 'k10', 'k11', 'k12',
+                        'l8', 'l7', 'l6', 'l5', 'l9', 'l10', 'l11', 'l12',
+                    ]
+                promotion:
+                    type: string
+                    enum: [ 'king', 'queen', 'bishop', 'rook', 'knight', 'pawn' ]
+            required:
+                - id
+                - position
+        GameSession:
+            type: object
+            properties:
+                id:
+                    type: integer
+                status:
+                    type: string
+                    enum: [ 'wait', 'game', 'complete' ]
+        UserInfoList:
+            type: array
+            items:
+                $ref: '#/components/schemas/UserInfoItem'
+        UserInfoItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                name:
+                    type: string
+                status:
+                    type: string
+                    enum: [ 'connecting', 'not_ready', 'ready', 'playing', 'done', 'disconnected' ]
+                color:
+                    type: string
+                    enum: [ 'white', 'black', 'red', 'none' ]
+            required:
+                - id
+                - name
+                - status
+                - color
+        PlayerInfoList:
+            type: array
+            items:
+                $ref: '#/components/schemas/PlayerInfoItem'
+        PlayerInfoItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                status:
+                    type: string
+                    enum: [ 'wait_turn', 'current_turn', 'lose', 'win' ]
+            required:
+                - id
+                - status
+        PieceList:
+            type: array
+            items:
+                $ref: '#/components/schemas/PieceItem'
+        PieceItem:
+            type: object
+            properties:
+                id:
+                    type: integer
+                type:
+                    type: string
+                    enum: [ 'king', 'queen', 'bishop', 'rook', 'knight', 'pawn' ]
+                color:
+                    type: string
+                    enum: [ 'white', 'black', 'red' ]
+                position:
+                    type: string
+                    enum: [
+                        'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8',
+                        'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8',
+                        'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8',
+                        'd1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8',
+                        'e1', 'e2', 'e3', 'e4', 'e9', 'e10', 'e11', 'e12',
+                        'f1', 'f2', 'f3', 'f4', 'f9', 'f10', 'f11', 'f12',
+                        'g1', 'g2', 'g3', 'g4', 'g9', 'g10', 'g11', 'g12',
+                        'h1', 'h2', 'h3', 'h4', 'h9', 'h10', 'h11', 'h12',
+                        'i8', 'i7', 'i6', 'i5', 'i9', 'i10', 'i11', 'i12',
+                        'j8', 'j7', 'j6', 'j5', 'j9', 'j10', 'j11', 'j12',
+                        'k8', 'k7', 'k6', 'k5', 'k9', 'k10', 'k11', 'k12',
+                        'l8', 'l7', 'l6', 'l5', 'l9', 'l10', 'l11', 'l12',
+                    ]
+            required:
+                - id
+                - type
+                - color
+                - position
+        PossibleMoveList:
+            type: array
+            items:
+                $ref: '#/components/schemas/PossibleMoveItem'
+        PossibleMoveItem:
+            type: object
+            properties:
+                value:
+                    type: string
+                    enum: [
+                        'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8',
+                        'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8',
+                        'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8',
+                        'd1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8',
+                        'e1', 'e2', 'e3', 'e4', 'e9', 'e10', 'e11', 'e12',
+                        'f1', 'f2', 'f3', 'f4', 'f9', 'f10', 'f11', 'f12',
+                        'g1', 'g2', 'g3', 'g4', 'g9', 'g10', 'g11', 'g12',
+                        'h1', 'h2', 'h3', 'h4', 'h9', 'h10', 'h11', 'h12',
+                        'i8', 'i7', 'i6', 'i5', 'i9', 'i10', 'i11', 'i12',
+                        'j8', 'j7', 'j6', 'j5', 'j9', 'j10', 'j11', 'j12',
+                        'k8', 'k7', 'k6', 'k5', 'k9', 'k10', 'k11', 'k12',
+                        'l8', 'l7', 'l6', 'l5', 'l9', 'l10', 'l11', 'l12',
+                    ]
+            required:
+                - value
+    securitySchemes:
+        BearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
