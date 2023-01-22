@@ -1,4 +1,4 @@
-openapi: '2.5.0'
+asyncapi: '2.5.0'
 info:
     title: TPC backend Websocket API
     version: 1.0.0
@@ -13,6 +13,8 @@ channels:
         publish:
             message:
                 oneOf:
+                    -   $ref: '#/components/messages/ConnectLobby'
+                    -   $ref: '#/components/messages/CreateLobby'
                     -   $ref: '#/components/messages/ChangeColor'
                     -   $ref: '#/components/messages/ChangeReadiness'
                     -   $ref: '#/components/messages/MovePiece'
@@ -24,13 +26,19 @@ channels:
                     -   $ref: '#/components/messages/UserInfoList'
                     -   $ref: '#/components/messages/PlayerInfoList'
                     -   $ref: '#/components/messages/PieceList'
-                    -   $ref: '#/components/messages/PossibleMoves'
+                    -   $ref: '#/components/messages/PossibleMoveList'
 components:
     messages:
         LobbyList:
             description: Available lobbies list
             payload:
                 $ref: '#/components/schemas/LobbyList'
+        ConnectLobby:
+            description: Connect lobby request
+            payload:
+                $ref: '#/components/schemas/Connection'
+        CreateLobby:
+            description: Create lobby request
         ChangeColor:
             description: Change color for current user
             payload:
@@ -79,25 +87,32 @@ components:
                     type: array
                     items:
                         type: string
-                required:
-                    - game_session_id
-                    - players
+            required:
+                - game_session_id
+                - players
+        Connection:
+            type: object
+            properties:
+                game_session_id:
+                    type: integer
+            required:
+                - game_session_id
         Color:
             type: object
             properties:
                 value:
                     type: string
                     enum: [ 'white', 'black', 'red', 'none' ]
-                required:
-                    - value
+            required:
+                - value
         ReadyStatus:
             type: object
             properties:
                 value:
                     type: string
                     enum: [ 'not_ready', 'ready' ]
-                required:
-                    - value
+            required:
+                - value
         PieceMovement:
             type: object
             properties:
