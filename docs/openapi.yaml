@@ -1,4 +1,4 @@
-openapi: "3.1"
+openapi: "3.1.0"
 info:
     title: TPC backend Rest API
     version: "1.0"
@@ -45,41 +45,6 @@ paths:
                     description: Incorrect register data
                 '500':
                     description: Something is wrong
-    /lobby/{game_session_id}/connect:
-        parameters:
-            -   name: game_session_id
-                description: Game session id for connection
-                in: path
-                required: true
-                schema:
-                    type: integer
-        post:
-            description: Connect current user to game session
-            responses:
-                '200':
-                    description: OK
-                '401':
-                    description: Auth required
-                '409':
-                    description: Game session is not available for connection or user has active game session
-                '500':
-                    description: Something is wrong
-            security:
-                - BearerAuth: []
-    /lobby/create:
-        post:
-            description: Create new game session and connect current user to it
-            responses:
-                '200':
-                    description: OK
-                '401':
-                    description: Auth required
-                '409':
-                    description: User has active game session
-                '500':
-                    description: Something is wrong
-            security:
-                - BearerAuth: []
     /rating:
         get:
             description: List of user rating info
