@@ -72,7 +72,7 @@ paths:
                 '500':
                     description: Something is wrong
             security:
-                - BearerAuth: []
+                -   BearerAuth: [ ]
     /profile/history:
         get:
             description: Current user game history info
@@ -88,7 +88,7 @@ paths:
                 '500':
                     description: Something is wrong
             security:
-                - BearerAuth: []
+                -   BearerAuth: [ ]
 
 components:
     schemas:
@@ -105,10 +105,13 @@ components:
         AuthToken:
             type: object
             properties:
-                jwt:
+                access_token:
+                    type: string
+                refresh_token:
                     type: string
             required:
-                - jwt
+                - access_token
+                - refresh_token
         RegisterData:
             type: object
             properties:
@@ -123,9 +126,14 @@ components:
                 - email
                 - password
         UserRatingList:
-            type: array
-            items:
-                $ref: '#/components/schemas/UserRatingItem'
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/UserRatingItem'
+            required:
+                - list
         UserRatingItem:
             type: object
             properties:
@@ -159,9 +167,14 @@ components:
                 - wins
                 - loses
         UserHistoryList:
-            type: array
-            items:
-                $ref: '#/components/schemas/UserHistoryItem'
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/UserHistoryItem'
+            required:
+                - list
         UserHistoryItem:
             type: object
             properties:
@@ -173,6 +186,10 @@ components:
                     type: array
                     items:
                         type: string
+            required:
+                - id
+                - scores_diff
+                - players
     securitySchemes:
         BearerAuth:
             type: http
