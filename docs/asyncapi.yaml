@@ -146,7 +146,7 @@ components:
             properties:
                 value:
                     type: string
-                    enum: [ 'create_lobby', 'consider' ]
+                    enum: [ 'create_lobby', 'consider', 'disconnect' ]
             required:
                 - value
         GameSession:
@@ -176,15 +176,19 @@ components:
                     type: integer
                 name:
                     type: string
+                rating:
+                    type: integer
                 status:
                     type: string
                     enum: [ 'not_ready', 'ready', 'playing', 'done', 'disconnected' ]
                 color:
                     type: string
-                    enum: [ 'white', 'black', 'red', 'none' ]
+                    nullable: true
+                    enum: [ 'white', 'black', 'red' ]
             required:
                 - id
                 - name
+                - rating
                 - status
                 - color
         PlayerInfoList:
