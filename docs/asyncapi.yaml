@@ -14,11 +14,10 @@ channels:
             message:
                 oneOf:
                     -   $ref: '#/components/messages/ConnectLobby'
-                    -   $ref: '#/components/messages/CreateLobby'
                     -   $ref: '#/components/messages/ChangeColor'
                     -   $ref: '#/components/messages/ChangeReadiness'
                     -   $ref: '#/components/messages/MovePiece'
-                    -   $ref: '#/components/messages/Consider'
+                    -   $ref: '#/components/messages/Request'
         subscribe:
             message:
                 oneOf:
@@ -37,8 +36,6 @@ components:
             description: Connect lobby request
             payload:
                 $ref: '#/components/schemas/Connection'
-        CreateLobby:
-            description: Create lobby request
         ChangeColor:
             description: Change color for current user
             payload:
@@ -52,7 +49,9 @@ components:
             payload:
                 $ref: '#/components/schemas/PieceMove'
         Consider:
-            description: Request to end the game
+            description: Contains one of the following requests - create lobby, consider
+            payload:
+                $ref: '#/components/schemas/Request'
         GameSession:
             description: Info about current lobby status
             payload:
@@ -142,6 +141,14 @@ components:
             required:
                 - id
                 - position
+        Request:
+            type: object
+            properties:
+                value:
+                    type: string
+                    enum: [ 'create_lobby', 'consider' ]
+            required:
+                - value
         GameSession:
             type: object
             properties:
@@ -150,6 +157,9 @@ components:
                 status:
                     type: string
                     enum: [ 'wait', 'game', 'complete' ]
+            required:
+                - id
+                - status
         UserInfoList:
             type: object
             properties:
